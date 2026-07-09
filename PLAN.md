@@ -143,6 +143,37 @@ README setup steps.
 - [ ] Sort and filter options on the library
 - [ ] Export a book's notes to plain text or markdown (share sheet)
 
+### Phase 5 — Surface notes (marker-driven, free, on-device)
+
+Turn the chapter log into a reference section automatically, by reading marker lines the
+reader already types. Pure string parsing plus SQLite. No API, no AI at runtime, no cost.
+Works on any iPhone that runs Expo Go, including the base iPhone 15.
+
+**Markers** (a line only counts if it starts with the marker, after optional whitespace, so
+normal prose is never misread):
+- `- Name: description` -> a character / reference entry
+- `* something` -> a highlight (a key beat)
+- `? something` -> a prediction
+
+- [ ] Character extraction: scan a book's chapter notes for `- Name: desc` lines, group by
+      name (case-insensitive), earliest chapter is the headline, later ones stack as a
+      chapter-tagged timeline. Record first-seen chapter and every chapter the name appears in.
+- [ ] Tap a character's chapter tag to jump to that chapter note.
+- [ ] Aliases: `character_aliases` table + a "Merge" action so "Ned" and "Eddard" fold into
+      one card. Deterministic matching can't guess nicknames, so this is the manual escape hatch.
+- [ ] Highlights sub-section: collect every `* ...` line, newest chapter first, chapter-tagged.
+- [ ] Predictions sub-section: collect every `? ...` line; mark each answered right or wrong and
+      persist the outcome. Reuse the predictions table where it fits.
+- [ ] Search box over the Reference tab: case-insensitive filter across characters, highlights,
+      and predictions. Start with LIKE; FTS5 slot noted for later.
+
+Build order, test on the phone after each: (1) character extraction + Characters view,
+no aliases; (2) alias table + Merge; (3) Highlights + Predictions; (4) search filter.
+
+**Where the free version stops:** extraction surfaces what you mark or what follows the
+`- Name: desc` pattern. Pulling the one important sentence out of untagged prose is the genuine
+AI task — that stays a Backlog item, and on a base iPhone 15 it would mean a paid API call.
+
 ---
 
 ## 7. Backlog / someday
@@ -153,6 +184,8 @@ Not scheduled. Captured so nothing is lost.
   chapter recap, "everything about this character so far," spoiler-safe summaries. Each would
   be an explicit button, so cost only ever happens when chosen. Some could run on-device on
   newer iPhones with no API at all. Skippable entirely.
+  Note: the marker-driven version of "everything about this character so far" is now free and
+  local in Phase 5. Only summarizing untagged prose needs paid AI.
 - Reading stats (chapters per week, streaks, pace).
 - Tags across notes (theme, mood) with tag-based browsing.
 - Multiple reference note types beyond the three (settings/places, vocabulary, quotes).

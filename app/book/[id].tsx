@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, Alert } from 'react-native';
+import { View, Text, StyleSheet, Alert } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
-import { Screen, Card, TextField, Button, SegmentedControl, EmptyState } from '@/components/ui';
+import { Screen, Card, TextField, Button, SegmentedControl, EmptyState, SwipeableRow } from '@/components/ui';
 import { bookQuery } from '@/features/books/queries';
 import {
   chapterNotesQuery,
@@ -69,18 +70,6 @@ function ChaptersTab({ bookId }: { bookId: number }) {
     setEditingId(note.id);
   }
 
-  function promptActions(note: ChapterNote) {
-    Alert.alert(
-      `Chapter ${note.chapterNumber}${note.title ? ` — ${note.title}` : ''}`,
-      undefined,
-      [
-        { text: 'Edit', onPress: () => startEditing(note) },
-        { text: 'Delete', style: 'destructive', onPress: () => confirmDelete(note) },
-        { text: 'Cancel', style: 'cancel' },
-      ],
-    );
-  }
-
   function confirmDelete(note: ChapterNote) {
     Alert.alert('Delete this note?', "This can't be undone.", [
       { text: 'Cancel', style: 'cancel' },
@@ -122,14 +111,20 @@ function ChaptersTab({ bookId }: { bookId: number }) {
             onDone={() => setEditingId(null)}
           />
         ) : (
-          <Card key={note.id} onLongPress={() => promptActions(note)}>
-            <Text style={styles.chapterLabel}>
-              Chapter {note.chapterNumber}
-              {note.title ? ` — ${note.title}` : ''}
-            </Text>
-            <Text style={styles.body}>{note.body || '(empty)'}</Text>
-            <Text style={styles.hint}>Long-press to edit or delete</Text>
-          </Card>
+          <SwipeableRow
+            key={note.id}
+            onEdit={() => startEditing(note)}
+            onDelete={() => confirmDelete(note)}
+          >
+            <Card>
+              <Text style={styles.chapterLabel}>
+                Chapter {note.chapterNumber}
+                {note.title ? ` — ${note.title}` : ''}
+              </Text>
+              <Text style={styles.body}>{note.body || '(empty)'}</Text>
+              <Text style={styles.hint}>Swipe left to edit or delete</Text>
+            </Card>
+          </SwipeableRow>
         ),
       )}
     </ScrollView>
