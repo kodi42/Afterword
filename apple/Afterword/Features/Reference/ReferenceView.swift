@@ -45,6 +45,8 @@ struct ReferenceView: View {
                 PredictionsSection(book: book, query: query, surfaced: parsed.predictions, onJump: onJump)
             }
         }
+        .animation(.snappy, value: section)
+        .sensoryFeedback(.selection, trigger: section)
     }
 }
 

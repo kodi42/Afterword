@@ -27,8 +27,8 @@ struct StatusBadge: View {
         switch tone {
         case .active: return Theme.Palette.accentSoft
         case .muted: return Theme.Palette.surfaceAlt
-        case .correct: return Color(hex: 0xDCEBE1)
-        case .wrong: return Color(hex: 0xF3D9D8)
+        case .correct: return Theme.Palette.badgeCorrect
+        case .wrong: return Theme.Palette.badgeWrong
         }
     }
 }

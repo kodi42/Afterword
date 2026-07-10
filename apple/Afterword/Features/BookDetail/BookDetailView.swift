@@ -46,7 +46,10 @@ struct BookDetailView: View {
                 }
             }
             .padding(.top, Theme.Space.sm)
+            .animation(.snappy, value: tab)
         }
+        .sensoryFeedback(.selection, trigger: tab)
+        .sensoryFeedback(.success, trigger: book.status)
         .navigationTitle(book.title)
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {

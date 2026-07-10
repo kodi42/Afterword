@@ -26,6 +26,7 @@
 		664344E8A7CE896155BE6047 /* AfterwordApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C27D660EC9BA1C649FE49EA7 /* AfterwordApp.swift */; };
 		6BACF11E1E83B2BF0B7FA975 /* CoverStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCADF02D41D095D86955769B /* CoverStore.swift */; };
 		6C7CE741A649C0B346C0B958 /* CardStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = C393029077357C045441AEAC /* CardStyle.swift */; };
+		703548D26AECA4DEFB2D0C52 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EFB0AE2BBA08F6D72498563E /* Assets.xcassets */; };
 		87F30B4AD0C98D0CFBDBD7C6 /* ReferenceView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A179445217F9C9DC642A6C12 /* ReferenceView.swift */; };
 		90902BF54243B46A7B2B7BF9 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 99D22833A657BB1DBB9102B4 /* RootView.swift */; };
 		967214FDF6F7F9EBE703A2DE /* BookFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1E348062EEE0BA0820C7A89 /* BookFormView.swift */; };
@@ -95,6 +96,7 @@
 		DDDBA1A6C48C61032F3BF2FD /* ChapterNote.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChapterNote.swift; sourceTree = "<group>"; };
 		E8188CE3BE5B85544666368D /* BookCover.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BookCover.swift; sourceTree = "<group>"; };
 		ED6796EAD3CEFC403E104B3F /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
+		EFB0AE2BBA08F6D72498563E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F55EA1E8FE450DDF9DDD22F4 /* PlainListRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlainListRow.swift; sourceTree = "<group>"; };
 		F7C592AC835B58431424FC21 /* Afterword.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Afterword.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FCADF02D41D095D86955769B /* CoverStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoverStore.swift; sourceTree = "<group>"; };
@@ -176,6 +178,7 @@
 		702988C0128046E61CA89C7F /* Afterword */ = {
 			isa = PBXGroup;
 			children = (
+				EFB0AE2BBA08F6D72498563E /* Assets.xcassets */,
 				1F326A63E22AFC2F81B032BD /* App */,
 				2A467D3BC901CADAC9705DFC /* DesignSystem */,
 				C0965DE27DEA9647B3D67B22 /* Features */,
@@ -299,6 +302,7 @@
 			buildConfigurationList = 15178180F14793A47CC7762D /* Build configuration list for PBXNativeTarget "Afterword" */;
 			buildPhases = (
 				1A80CE75E7ECCEFFD0C1B56C /* Sources */,
+				93DD23207F1D18D65EEC3A08 /* Resources */,
 			);
 			buildRules = (
 			);
@@ -365,6 +369,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		93DD23207F1D18D65EEC3A08 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				703548D26AECA4DEFB2D0C52 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		1A80CE75E7ECCEFFD0C1B56C /* Sources */ = {

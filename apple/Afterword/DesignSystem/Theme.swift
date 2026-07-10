@@ -1,22 +1,24 @@
 import SwiftUI
+import UIKit
 
 /// Design tokens ported from the RN app's `src/theme/tokens.ts` — the warm
-/// "paper and ink" identity. Colors are defined as light values here; Phase B
-/// promotes them to an asset catalog with Dark Mode variants. Spacing/radius/type
-/// match the RN scale 1:1 so the port stays visually honest.
+/// "paper and ink" identity, now light/dark adaptive. Spacing/radius/type match
+/// the RN scale 1:1 so the port stays visually honest.
 enum Theme {
     enum Palette {
-        static let bg = Color(hex: 0xF6F1E7)          // warm paper
-        static let surface = Color(hex: 0xFFFFFF)      // cards
-        static let surfaceAlt = Color(hex: 0xEFE7D6)   // subtle fills
-        static let ink = Color(hex: 0x26221C)          // primary text
-        static let inkSoft = Color(hex: 0x6B6357)      // secondary text
-        static let inkFaint = Color(hex: 0xA79E8C)     // hints, placeholders
-        static let accent = Color(hex: 0xB4562B)       // terracotta
-        static let accentSoft = Color(hex: 0xF0DDCF)
-        static let border = Color(hex: 0xE3DACA)
-        static let success = Color(hex: 0x3F7A55)
-        static let danger = Color(hex: 0xB23A38)
+        static let bg = Color(light: 0xF6F1E7, dark: 0x17140F)          // warm paper / ink night
+        static let surface = Color(light: 0xFFFFFF, dark: 0x231E17)      // cards
+        static let surfaceAlt = Color(light: 0xEFE7D6, dark: 0x322B20)   // subtle fills
+        static let ink = Color(light: 0x26221C, dark: 0xEDE7DA)          // primary text
+        static let inkSoft = Color(light: 0x6B6357, dark: 0xB3A996)      // secondary text
+        static let inkFaint = Color(light: 0xA79E8C, dark: 0x7C7362)     // hints, placeholders
+        static let accent = Color(light: 0xB4562B, dark: 0xD07A4E)       // terracotta
+        static let accentSoft = Color(light: 0xF0DDCF, dark: 0x40291D)
+        static let border = Color(light: 0xE3DACA, dark: 0x3A3227)
+        static let success = Color(light: 0x3F7A55, dark: 0x74B78C)
+        static let danger = Color(light: 0xB23A38, dark: 0xDD6763)
+        static let badgeCorrect = Color(light: 0xDCEBE1, dark: 0x24382B)
+        static let badgeWrong = Color(light: 0xF3D9D8, dark: 0x3E2523)
     }
 
     /// 8pt-ish spacing scale (matches RN spacing tokens).
@@ -58,5 +60,12 @@ extension Color {
             blue: Double(hex & 0xFF) / 255,
             opacity: alpha
         )
+    }
+
+    /// An adaptive color that resolves to `light` or `dark` per the trait environment.
+    init(light: UInt, dark: UInt) {
+        self = Color(uiColor: UIColor { traits in
+            UIColor(Color(hex: traits.userInterfaceStyle == .dark ? dark : light))
+        })
     }
 }
