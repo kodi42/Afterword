@@ -1,0 +1,6 @@
+# Xcode / build cruft — project.yml is the source of truth (regenerate via `xcodegen`)
+*.xcodeproj/xcuserdata/
+*.xcodeproj/project.xcworkspace/xcuserdata/
+DerivedData/
+build/
+.DS_Store
