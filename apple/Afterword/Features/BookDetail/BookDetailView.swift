@@ -5,12 +5,16 @@ import SwiftData
 /// Chapters / Reference segmented control. Port of the RN `app/book/[id].tsx`.
 struct BookDetailView: View {
     @Bindable var book: Book
+    /// Where to land (search results deep-link straight to Reference or to a note).
+    var initialTab: DetailTab = .chapters
+    var initialJump: Int?
     @Environment(\.modelContext) private var context
     @Environment(\.dismiss) private var dismiss
 
     @State private var tab: DetailTab = .chapters
     @State private var showingEdit = false
     @State private var showingDeleteConfirm = false
+    @State private var appliedInitial = false
     /// Cross-tab jump target: set to a chapter number to switch to Chapters and
     /// scroll there (used by reference tags in Phase F and search in Phase G).
     @State private var jumpChapter: Int?
@@ -45,6 +49,16 @@ struct BookDetailView: View {
         }
         .navigationTitle(book.title)
         .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            guard !appliedInitial else { return }
+            appliedInitial = true
+            if let initialJump {
+                tab = .chapters
+                jumpChapter = initialJump
+            } else {
+                tab = initialTab
+            }
+        }
         .toolbar { ToolbarItem(placement: .topBarTrailing) { menu } }
         .sheet(isPresented: $showingEdit) { BookFormView(mode: .edit(book)) }
         .confirmationDialog("Delete this book?", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
@@ -100,4 +114,12 @@ struct BookDetailView: View {
             Image(systemName: "ellipsis.circle")
         }
     }
+}
+
+/// Navigation value for a deep-link into a book at a specific tab (and optional
+/// chapter note). Used by search results.
+struct BookJump: Hashable {
+    let book: Book
+    let tab: BookDetailView.DetailTab
+    let jump: Int?
 }

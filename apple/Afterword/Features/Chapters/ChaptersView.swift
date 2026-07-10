@@ -54,9 +54,14 @@ struct ChaptersView: View {
             }
             .listStyle(.plain)
             .scrollContentBackground(.hidden)
-            .onChange(of: jumpChapter) { _, target in
+            .onChange(of: jumpChapter, initial: true) { _, target in
                 guard let target else { return }
-                withAnimation { proxy.scrollTo(target, anchor: .top) }
+                // A short delay lets the List lay out its rows (covers the
+                // deep-link case where the value is already set on first appear).
+                Task {
+                    try? await Task.sleep(for: .milliseconds(60))
+                    withAnimation { proxy.scrollTo(target, anchor: .top) }
+                }
                 flashHighlight(target)
                 jumpChapter = nil
             }

@@ -7,6 +7,7 @@ import SwiftData
 struct LibraryView: View {
     @Query(sort: \Book.updatedAt, order: .reverse) private var books: [Book]
     @State private var showingAdd = false
+    @State private var showingSearch = false
 
     private var reading: [Book] { books.filter { $0.status != .finished } }
     private var finished: [Book] { books.filter { $0.status == .finished } }
@@ -19,7 +20,18 @@ struct LibraryView: View {
                 addButton
             }
             .navigationTitle("Afterword")
+            .toolbar {
+                if !books.isEmpty {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button { showingSearch = true } label: { Image(systemName: "magnifyingglass") }
+                    }
+                }
+            }
             .navigationDestination(for: Book.self) { BookDetailView(book: $0) }
+            .navigationDestination(for: BookJump.self) {
+                BookDetailView(book: $0.book, initialTab: $0.tab, initialJump: $0.jump)
+            }
+            .navigationDestination(isPresented: $showingSearch) { SearchView() }
             .sheet(isPresented: $showingAdd) { BookFormView(mode: .add) }
         }
         .tint(Theme.Palette.accent)
