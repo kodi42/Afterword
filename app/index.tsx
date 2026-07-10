@@ -1,16 +1,26 @@
 import { useMemo } from 'react';
-import { FlatList, Pressable, Text, View, StyleSheet } from 'react-native';
+import { FlatList, Pressable, Text, View, StyleSheet, Alert } from 'react-native';
 import { Link, useRouter, Stack } from 'expo-router';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { Screen, Card, EmptyState } from '@/components/ui';
 import { BookCover } from '@/components/BookCover';
 import { booksQuery } from '@/features/books/queries';
+import { exportAllData } from '@/features/export/exportData';
 import type { Book } from '@/db/schema';
 import { colors, radius, spacing, type } from '@/theme';
 
 export default function Library() {
   const router = useRouter();
   const { data: books } = useLiveQuery(booksQuery);
+
+  async function handleExport() {
+    try {
+      const ok = await exportAllData();
+      if (!ok) Alert.alert('Export unavailable', 'Sharing is not available on this device.');
+    } catch (e) {
+      Alert.alert('Export failed', e instanceof Error ? e.message : 'Could not build the export file.');
+    }
+  }
 
   const { reading, finished } = useMemo(() => {
     const all = (books ?? []) as Book[];
@@ -31,9 +41,14 @@ export default function Library() {
         options={{
           headerRight: () =>
             books && books.length > 0 ? (
-              <Pressable onPress={() => router.push('/search')} hitSlop={12}>
-                <Text style={styles.headerAction}>Search</Text>
-              </Pressable>
+              <View style={{ flexDirection: 'row', gap: spacing.md }}>
+                <Pressable onPress={handleExport} hitSlop={12}>
+                  <Text style={styles.headerAction}>Export</Text>
+                </Pressable>
+                <Pressable onPress={() => router.push('/search')} hitSlop={12}>
+                  <Text style={styles.headerAction}>Search</Text>
+                </Pressable>
+              </View>
             ) : null,
         }}
       />
