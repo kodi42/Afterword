@@ -1,25 +1,17 @@
 import SwiftUI
+import SwiftData
 
-/// Temporary Phase 0 root — a themed placeholder that proves the design tokens
-/// and app shell are wired. Phase C replaces this with the Library.
+/// App root. The Library owns the navigation stack.
 struct RootView: View {
-    var body: some View {
-        NavigationStack {
-            ZStack {
-                Theme.Palette.bg.ignoresSafeArea()
-                VStack(spacing: Theme.Space.sm) {
-                    Text("Afterword")
-                        .font(Theme.Font.display)
-                        .foregroundStyle(Theme.Palette.ink)
-                    Text("Native rebuild — foundation in place")
-                        .font(Theme.Font.caption)
-                        .foregroundStyle(Theme.Palette.inkSoft)
-                }
-            }
-        }
-    }
-}
+    @Environment(\.modelContext) private var context
+    @Query private var books: [Book]
 
-#Preview {
-    RootView()
+    var body: some View {
+        LibraryView()
+            .task {
+                #if DEBUG
+                PreviewSeed.seedIfNeeded(context: context, existing: books)
+                #endif
+            }
+    }
 }
