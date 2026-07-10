@@ -35,9 +35,10 @@ struct BookDetailView: View {
                 case .chapters:
                     ChaptersView(book: book, jumpChapter: $jumpChapter)
                 case .reference:
-                    ContentUnavailableView("Reference coming next",
-                                           systemImage: "person.2",
-                                           description: Text("Characters, highlights, and predictions."))
+                    ReferenceView(book: book) { chapter in
+                        tab = .chapters
+                        jumpChapter = chapter
+                    }
                 }
             }
             .padding(.top, Theme.Space.sm)
