@@ -1,7 +1,7 @@
 import { File, Directory, Paths } from 'expo-file-system';
 
 /**
- * Local persistence for cover images. Covers are chosen from Google Books
+ * Local persistence for cover images. Covers are chosen from Open Library
  * (coverSearch.ts) and downloaded here into the app's document directory, so a
  * cover keeps working offline and needs no repeat network call at read time.
  */

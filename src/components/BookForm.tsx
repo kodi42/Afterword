@@ -28,7 +28,7 @@ export type BookFormValues = {
  * The book title/author/chapters form, shared by the add-book and edit-book
  * modals. Title is the only required field.
  *
- * Cover images are found by searching Google Books for the title (no camera roll,
+ * Cover images are found by searching Open Library for the title (no camera roll,
  * no API key). The picked thumbnail is only downloaded + persisted on save, so we
  * don't fetch covers the reader never keeps.
  */
@@ -133,7 +133,7 @@ export function BookForm({
                   {previewUri ? 'Find a different cover' : 'Find cover'}
                 </Text>
               </Pressable>
-              <Text style={styles.coverHint}>Searches Google Books by title.</Text>
+              <Text style={styles.coverHint}>Searches Open Library by title.</Text>
               {previewUri ? (
                 <Pressable onPress={removeCover} hitSlop={8}>
                   <Text style={styles.coverRemove}>Remove</Text>

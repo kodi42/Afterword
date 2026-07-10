@@ -1,69 +1,68 @@
 import { describe, it, expect } from 'vitest';
-import { parseCoverResults, coverSearchUrl } from '@/features/books/coverSearch';
+import { parseCoverResults, coverSearchUrl, coverImageUrl } from '@/features/books/coverSearch';
 
 describe('parseCoverResults', () => {
-  it('returns [] for a non-Books response', () => {
+  it('returns [] for a non-search response', () => {
     expect(parseCoverResults({})).toEqual([]);
     expect(parseCoverResults(null)).toEqual([]);
   });
 
-  it('maps volumes to covers and upgrades http thumbnails to https', () => {
+  it('maps docs with a cover to https cover-image urls', () => {
     const json = {
-      items: [
-        {
-          id: 'abc',
-          volumeInfo: {
-            title: 'Throne of Glass',
-            authors: ['Sarah J. Maas'],
-            imageLinks: { thumbnail: 'http://books.google.com/x?id=abc&img=1' },
-          },
-        },
+      docs: [
+        { key: '/works/OL1W', title: 'Throne of Glass', author_name: ['Sarah J. Maas'], cover_i: 13312488 },
       ],
     };
     const [cover] = parseCoverResults(json);
-    expect(cover.id).toBe('abc');
+    expect(cover.id).toBe('/works/OL1W');
     expect(cover.title).toBe('Throne of Glass');
     expect(cover.authors).toBe('Sarah J. Maas');
-    expect(cover.thumbnail.startsWith('https://')).toBe(true);
+    expect(cover.thumbnail).toBe('https://covers.openlibrary.org/b/id/13312488-M.jpg');
   });
 
-  it('skips volumes without any image link', () => {
+  it('skips docs with no cover_i (they resolve to a blank pixel)', () => {
     const json = {
-      items: [
-        { id: '1', volumeInfo: { title: 'No Cover' } },
-        { id: '2', volumeInfo: { title: 'Has Cover', imageLinks: { smallThumbnail: 'https://x/y.jpg' } } },
+      docs: [
+        { key: '/works/A', title: 'No Cover' },
+        { key: '/works/B', title: 'Has Cover', cover_i: 42 },
       ],
     };
     const results = parseCoverResults(json);
     expect(results).toHaveLength(1);
-    expect(results[0].id).toBe('2');
+    expect(results[0].id).toBe('/works/B');
   });
 
-  it('falls back to smallThumbnail and de-dupes identical thumbnails', () => {
+  it('de-dupes repeated cover ids', () => {
     const json = {
-      items: [
-        { id: '1', volumeInfo: { imageLinks: { thumbnail: 'https://same.jpg' } } },
-        { id: '2', volumeInfo: { imageLinks: { thumbnail: 'https://same.jpg' } } },
+      docs: [
+        { key: '/works/A', cover_i: 7 },
+        { key: '/works/B', cover_i: 7 },
       ],
     };
     expect(parseCoverResults(json)).toHaveLength(1);
   });
 
-  it('handles a missing authors array', () => {
-    const json = { items: [{ id: '1', volumeInfo: { title: 'X', imageLinks: { thumbnail: 'https://x.jpg' } } }] };
+  it('handles a missing author_name array', () => {
+    const json = { docs: [{ key: '/works/A', title: 'X', cover_i: 1 }] };
     expect(parseCoverResults(json)[0].authors).toBe('');
   });
 });
 
 describe('coverSearchUrl', () => {
-  it('encodes intitle and adds inauthor when present', () => {
+  it('encodes the title and adds author when present', () => {
     const url = coverSearchUrl('Throne of Glass', 'Maas');
-    expect(url).toContain('intitle');
-    expect(decodeURIComponent(url)).toContain('intitle:Throne of Glass');
-    expect(decodeURIComponent(url)).toContain('inauthor:Maas');
+    expect(url.startsWith('https://openlibrary.org/search.json?')).toBe(true);
+    expect(decodeURIComponent(url)).toContain('title=Throne of Glass');
+    expect(decodeURIComponent(url)).toContain('author=Maas');
   });
 
-  it('omits inauthor when no author', () => {
-    expect(decodeURIComponent(coverSearchUrl('Dune'))).not.toContain('inauthor');
+  it('omits author when none given', () => {
+    expect(decodeURIComponent(coverSearchUrl('Dune'))).not.toContain('author=');
+  });
+});
+
+describe('coverImageUrl', () => {
+  it('builds sized cover urls', () => {
+    expect(coverImageUrl(99, 'L')).toBe('https://covers.openlibrary.org/b/id/99-L.jpg');
   });
 });

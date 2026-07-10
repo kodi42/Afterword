@@ -27,7 +27,7 @@ in-progress books cleanly.
 | Storage | Local only, on device | Personal app. No sync, no server, no auth to build. |
 | Database | SQLite via expo-sqlite, queried with Drizzle ORM | Structured, relational, type-safe. Search is a local query, free forever. |
 | Notes model | Structured records, not freeform text | Each character/highlight/prediction is its own row you can search, sort, and update. Only the name/title is required, so adding an entry stays fast. |
-| Cost model | Zero recurring cost | No paid APIs, no keys. The one runtime network call is cover search (Google Books API — keyless, free, user-initiated only); the chosen cover is downloaded and cached locally, so everything else runs offline. |
+| Cost model | Zero recurring cost | No paid APIs, no keys. The one runtime network call is cover search (Open Library — keyless, free, user-initiated only; keyless Google Books shares a globally-exhausted quota and 429s, so it was rejected); the chosen cover is downloaded and cached locally, so everything else runs offline. |
 | AI at runtime | None in v1 | Every planned feature is plain local data work. AI stays an optional, on-demand, someday convenience (see Backlog). |
 
 ---
@@ -186,7 +186,7 @@ AI task — that stays a Backlog item, and on a base iPhone 15 it would mean a p
       wildcard-escaped). Global, from the Library header; results deep-link to the book +
       tab (+ chapter jump for notes). Pure local, no AI, no cost.
       FTS5 upgrade for ranked results still noted for later — `searchAll` call sites won't change.
-- [x] Cover images: search Google Books by title (keyless, free — no camera roll), pick from
+- [x] Cover images: search Open Library by title (keyless, free — no camera roll), pick from
       the results (first is the default), download the chosen image into document/covers via the
       expo-file-system File API, store the uri on books.coverUri. Set/change/remove in the add +
       edit forms; shown on library rows and the detail header; file cleaned up on delete.
