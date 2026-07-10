@@ -7,7 +7,9 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "db:generate": "drizzle-kit generate",
-    "db:studio": "drizzle-kit studio"
+    "db:studio": "drizzle-kit studio",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "babel-preset-expo": "~54.0.10",
@@ -15,6 +17,7 @@
     "expo": "^54.0.0",
     "expo-asset": "~12.0.13",
     "expo-constants": "~18.0.13",
+    "expo-file-system": "~19.0.23",
     "expo-linking": "~8.0.12",
     "expo-router": "~6.0.24",
     "expo-sqlite": "~16.0.10",
@@ -28,10 +31,13 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/react": "~19.1.10",
     "babel-plugin-inline-import": "^3.0.0",
+    "better-sqlite3": "^12.11.1",
     "drizzle-kit": "^0.28.1",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "vitest": "^4.1.10"
   },
   "private": true
 }

@@ -12,7 +12,7 @@ A personal iPhone app for taking reading notes. Two jobs:
 1. **Chapter log** — after finishing a chapter, write down what happened and what you thought.
    A running reflection journal, one entry per chapter, per book.
 2. **Reference section** — structured notes you flip back to when you forget something mid-read:
-   who a character is, what a plot thread is doing, and predictions you want to check later.
+   who a character is, a highlight worth remembering, and predictions you want to check later.
 
 Built for reading several books at once (fiction and nonfiction), so the library handles many
 in-progress books cleanly.
@@ -26,8 +26,8 @@ in-progress books cleanly.
 | Platform | iPhone via Expo (React Native) | Runs on the phone through Expo Go with no Apple Developer account and no cost. Fast edit-and-reload loop. TypeScript, which fits existing JS experience. |
 | Storage | Local only, on device | Personal app. No sync, no server, no auth to build. |
 | Database | SQLite via expo-sqlite, queried with Drizzle ORM | Structured, relational, type-safe. Search is a local query, free forever. |
-| Notes model | Structured records, not freeform text | Each character/thread/prediction is its own row you can search, sort, and update. Only the name/title is required, so adding an entry stays fast. |
-| Cost model | Zero recurring cost | Nothing calls an external API at runtime. AI is a build-time tool only. The finished app runs fully on its own. |
+| Notes model | Structured records, not freeform text | Each character/highlight/prediction is its own row you can search, sort, and update. Only the name/title is required, so adding an entry stays fast. |
+| Cost model | Zero recurring cost | No paid APIs, no keys. The one runtime network call is cover search (Google Books API — keyless, free, user-initiated only); the chosen cover is downloaded and cached locally, so everything else runs offline. |
 | AI at runtime | None in v1 | Every planned feature is plain local data work. AI stays an optional, on-demand, someday convenience (see Backlog). |
 
 ---
@@ -64,7 +64,7 @@ expo-router, where the file path is the route.
 - **Add book** (`app/book/new.tsx`) — modal. Title required, everything else optional.
 - **Book detail** (`app/book/[id].tsx`) — title header, then a segmented control:
   - **Chapters tab** — the reflection log. Add a note for the next chapter, list past notes newest-first.
-  - **Reference tab** — sub-sections for Characters, Plot threads, Predictions. (Phase 3.)
+  - **Reference tab** — sub-sections for Characters, Highlights, Predictions. (Phase 3.)
 
 Later screens (backlog): note detail/edit, character detail, global search.
 
@@ -93,7 +93,7 @@ afterword/
 │   ├── features/               ← data access + logic, grouped by feature
 │   │   ├── books/queries.ts
 │   │   ├── chapters/queries.ts
-│   │   └── reference/          ← characters / threads / predictions (Phase 3)
+│   │   └── reference/          ← characters / predictions (Phase 3); highlights in Phase 4
 │   ├── components/ui/          ← Button, Card, TextField, SegmentedControl, Screen, EmptyState
 │   └── theme/                  ← colors, spacing, radius, type tokens
 ```
@@ -116,9 +116,9 @@ README setup steps.
 ### Phase 1 — Library and books
 - [x] Library screen: currently reading / finished shelves, empty state, add button
 - [x] Add book modal (title, author, total chapters)
-- [ ] Edit book (tap-and-hold or an edit button on detail)
-- [ ] Mark a book finished; delete a book (with confirm)
-- [ ] Show reading progress on each row
+- [x] Edit book (Edit button in the detail header → edit modal)
+- [x] Mark a book finished (with a move-back-to-reading undo); delete a book (with confirm)
+- [x] Show reading progress on each row
 
 ### Phase 2 — Chapter log (the core, ship this first) ✅
 - [x] Chapters tab: add a note for the next chapter, list notes (newest chapter first)
@@ -128,22 +128,22 @@ README setup steps.
 
 **v1 ships at the end of Phase 2.** A working library plus the chapter log is a usable app.
 
-### Phase 3 — Reference section
-- [ ] `src/features/reference/` query modules for characters, threads, predictions
-- [ ] Characters: list + add/edit, status active/gone, first-seen chapter
-- [ ] Plot threads: list + add/edit, open/resolved, filter resolved out
-- [ ] Predictions: make a guess, later mark answered + right/wrong, record outcome
-- [ ] Reference tab wires these into three sub-sections
+### Phase 3 — Reference section (foundation)
 
-### Phase 4 — Search and polish
-- [ ] Search across chapter notes and reference entries (start with SQL `LIKE`, graduate to
-      SQLite FTS5 for ranked, instant results). Pure local, no AI, no cost.
-- [ ] Cover images (expo-image-picker, store the local uri)
-- [ ] Finished-books archive view
-- [ ] Sort and filter options on the library
-- [ ] Export a book's notes to plain text or markdown (share sheet)
+Build the reference tables and the Reference tab shell, with manual add/edit as the
+baseline way to create entries. Phase 4 later auto-populates Characters and Predictions
+from markers in chapter notes, so keep the manual forms lean, don't gold-plate them.
 
-### Phase 5 — Surface notes (marker-driven, free, on-device)
+- [x] `src/features/reference/` query modules for characters and predictions
+- [x] Characters: manual list + add/edit, status active/gone, first-seen chapter.
+      (Phase 4 auto-builds these from `- Name: desc` lines; this is the manual baseline.)
+- [x] Predictions: manual make-a-guess + mark answered right/wrong, record outcome.
+      Build the mark-right/wrong logic once here; Phase 4 reuses it for `?` marker predictions.
+      (`answerPrediction` / `reopenPrediction` in reference/queries.ts.)
+- [x] Reference tab wires into three sub-sections: Characters, Highlights, Predictions.
+      Highlights is populated in Phase 4; leave it as an empty-state placeholder for now.
+
+### Phase 4 — Surface notes (marker-driven, free, on-device)
 
 Turn the chapter log into a reference section automatically, by reading marker lines the
 reader already types. Pure string parsing plus SQLite. No API, no AI at runtime, no cost.
@@ -155,24 +155,45 @@ normal prose is never misread):
 - `* something` -> a highlight (a key beat)
 - `? something` -> a prediction
 
-- [ ] Character extraction: scan a book's chapter notes for `- Name: desc` lines, group by
+- [x] Character extraction: scan a book's chapter notes for `- Name: desc` lines, group by
       name (case-insensitive), earliest chapter is the headline, later ones stack as a
       chapter-tagged timeline. Record first-seen chapter and every chapter the name appears in.
-- [ ] Tap a character's chapter tag to jump to that chapter note.
-- [ ] Aliases: `character_aliases` table + a "Merge" action so "Ned" and "Eddard" fold into
+      (`src/features/surface/parser.ts`, computed live — no reconciliation.)
+- [x] Tap a character's chapter tag to jump to that chapter note.
+      (Reference → Chapters tab, scroll-to + brief highlight.)
+- [x] Aliases: `character_aliases` table + a "Merge" action so "Ned" and "Eddard" fold into
       one card. Deterministic matching can't guess nicknames, so this is the manual escape hatch.
-- [ ] Highlights sub-section: collect every `* ...` line, newest chapter first, chapter-tagged.
-- [ ] Predictions sub-section: collect every `? ...` line; mark each answered right or wrong and
+      (Chained merges flatten; folded aliases show on the card with an unmerge ✕.)
+- [x] Highlights sub-section: collect every `* ...` line, newest chapter first, chapter-tagged.
+- [x] Predictions sub-section: collect every `? ...` line; mark each answered right or wrong and
       persist the outcome. Reuse the predictions table where it fits.
-- [ ] Search box over the Reference tab: case-insensitive filter across characters, highlights,
+      (Answering a `?` line materialises it into the predictions table via `answerSurfacedPrediction`,
+      then the raw line is deduped out.)
+- [x] Search box over the Reference tab: case-insensitive filter across characters, highlights,
       and predictions. Start with LIKE; FTS5 slot noted for later.
+      (Client-side substring filter over the surfaced + manual entries in the active section.)
 
 Build order, test on the phone after each: (1) character extraction + Characters view,
 no aliases; (2) alias table + Merge; (3) Highlights + Predictions; (4) search filter.
+Built together; phone pass still pending.
 
 **Where the free version stops:** extraction surfaces what you mark or what follows the
 `- Name: desc` pattern. Pulling the one important sentence out of untagged prose is the genuine
 AI task — that stays a Backlog item, and on a base iPhone 15 it would mean a paid API call.
+
+### Phase 5 — Search and polish
+- [x] Search across chapter notes and reference entries (SQL `LIKE`, case-insensitive,
+      wildcard-escaped). Global, from the Library header; results deep-link to the book +
+      tab (+ chapter jump for notes). Pure local, no AI, no cost.
+      FTS5 upgrade for ranked results still noted for later — `searchAll` call sites won't change.
+- [x] Cover images: search Google Books by title (keyless, free — no camera roll), pick from
+      the results (first is the default), download the chosen image into document/covers via the
+      expo-file-system File API, store the uri on books.coverUri. Set/change/remove in the add +
+      edit forms; shown on library rows and the detail header; file cleaned up on delete.
+      Result parsing is unit-tested (`coverSearch.ts`); the network + download need a device.
+- [ ] Finished-books archive view
+- [ ] Sort and filter options on the library
+- [ ] Export a book's notes to plain text or markdown (share sheet)
 
 ---
 
@@ -185,7 +206,10 @@ Not scheduled. Captured so nothing is lost.
   be an explicit button, so cost only ever happens when chosen. Some could run on-device on
   newer iPhones with no API at all. Skippable entirely.
   Note: the marker-driven version of "everything about this character so far" is now free and
-  local in Phase 5. Only summarizing untagged prose needs paid AI.
+  local in Phase 4. Only summarizing untagged prose needs paid AI.
+- **Plot threads** (open/resolved plotlines tracked across chapters). Dropped from v1
+  reference scope. If revived, make it marker-driven (e.g. a `~` line) rather than manual
+  entry, to fit the surfacing pattern.
 - Reading stats (chapters per week, streaks, pace).
 - Tags across notes (theme, mood) with tag-based browsing.
 - Multiple reference note types beyond the three (settings/places, vocabulary, quotes).

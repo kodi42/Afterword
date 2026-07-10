@@ -78,6 +78,22 @@ export const plotThreads = sqliteTable('plot_threads', {
   ...timestamps,
 });
 
+/**
+ * Merge escape hatch for surfaced characters. Deterministic marker extraction
+ * can't guess that "Ned" and "Eddard" are one person, so a merge writes an alias
+ * row: the `alias` name folds into the `canonical` name at parse time. Both are
+ * stored normalized (trimmed, lower-cased) to match how names are grouped.
+ */
+export const characterAliases = sqliteTable('character_aliases', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  bookId: integer('book_id')
+    .notNull()
+    .references(() => books.id, { onDelete: 'cascade' }),
+  alias: text('alias').notNull(), // the surfaced name that disappears
+  canonical: text('canonical').notNull(), // the name it folds into
+  ...timestamps,
+});
+
 /** Reference: a guess you make while reading, that you can later mark right or wrong. */
 export const predictions = sqliteTable('predictions', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -99,5 +115,9 @@ export type NewBook = typeof books.$inferInsert;
 export type ChapterNote = typeof chapterNotes.$inferSelect;
 export type NewChapterNote = typeof chapterNotes.$inferInsert;
 export type Character = typeof characters.$inferSelect;
+export type NewCharacter = typeof characters.$inferInsert;
 export type PlotThread = typeof plotThreads.$inferSelect;
 export type Prediction = typeof predictions.$inferSelect;
+export type NewPrediction = typeof predictions.$inferInsert;
+export type CharacterAlias = typeof characterAliases.$inferSelect;
+export type NewCharacterAlias = typeof characterAliases.$inferInsert;

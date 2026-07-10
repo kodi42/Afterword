@@ -49,6 +49,14 @@ export async function markFinished(id: number) {
     .where(eq(books.id, id));
 }
 
+/** Undo "finished" — put a book back on the reading shelf. */
+export async function markReading(id: number) {
+  await db
+    .update(books)
+    .set({ status: 'reading', finishedAt: null, updatedAt: new Date() })
+    .where(eq(books.id, id));
+}
+
 export async function deleteBook(id: number) {
   await db.delete(books).where(eq(books.id, id));
 }

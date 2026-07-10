@@ -1,8 +1,9 @@
 import { useMemo } from 'react';
 import { FlatList, Pressable, Text, View, StyleSheet } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { Link, useRouter, Stack } from 'expo-router';
 import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { Screen, Card, EmptyState } from '@/components/ui';
+import { BookCover } from '@/components/BookCover';
 import { booksQuery } from '@/features/books/queries';
 import type { Book } from '@/db/schema';
 import { colors, radius, spacing, type } from '@/theme';
@@ -26,6 +27,16 @@ export default function Library() {
 
   return (
     <Screen>
+      <Stack.Screen
+        options={{
+          headerRight: () =>
+            books && books.length > 0 ? (
+              <Pressable onPress={() => router.push('/search')} hitSlop={12}>
+                <Text style={styles.headerAction}>Search</Text>
+              </Pressable>
+            ) : null,
+        }}
+      />
       {(!books || books.length === 0) ? (
         <EmptyState
           title="No books yet"
@@ -67,15 +78,22 @@ function BookRow({ book }: { book: Book }) {
   return (
     <Link href={{ pathname: '/book/[id]', params: { id: String(book.id) } }} asChild>
       <Card>
-        <Text style={styles.bookTitle} numberOfLines={1}>{book.title}</Text>
-        {book.author ? <Text style={styles.bookAuthor}>{book.author}</Text> : null}
-        {progress ? <Text style={styles.progress}>{progress}</Text> : null}
+        <View style={styles.row}>
+          <BookCover uri={book.coverUri} width={48} />
+          <View style={{ flex: 1 }}>
+            <Text style={styles.bookTitle} numberOfLines={1}>{book.title}</Text>
+            {book.author ? <Text style={styles.bookAuthor}>{book.author}</Text> : null}
+            {progress ? <Text style={styles.progress}>{progress}</Text> : null}
+          </View>
+        </View>
       </Card>
     </Link>
   );
 }
 
 const styles = StyleSheet.create({
+  headerAction: { ...type.label, color: colors.accent },
+  row: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
   sectionLabel: { ...type.label, color: colors.inkSoft, marginBottom: spacing.sm, textTransform: 'uppercase', letterSpacing: 0.5 },
   bookTitle: { ...type.title, color: colors.ink },
   bookAuthor: { ...type.body, color: colors.inkSoft, marginTop: 2 },

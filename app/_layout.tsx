@@ -43,10 +43,15 @@ export default function RootLayout() {
         }}
       >
         <Stack.Screen name="index" options={{ title: 'Afterword' }} />
+        <Stack.Screen name="search" options={{ title: 'Search' }} />
         <Stack.Screen name="book/[id]" options={{ title: '' }} />
         <Stack.Screen
           name="book/new"
           options={{ title: 'Add a book', presentation: 'modal' }}
+        />
+        <Stack.Screen
+          name="book/edit"
+          options={{ title: 'Edit book', presentation: 'modal' }}
         />
       </Stack>
     </GestureHandlerRootView>
