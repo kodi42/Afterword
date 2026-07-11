@@ -1,10 +1,10 @@
 import SwiftUI
 import SwiftData
 
-/// Add / edit a book. Cover images are found by searching Open Library for the
-/// title (no camera roll); the picked thumbnail is downloaded + persisted only on
-/// save, so we don't fetch covers the reader never keeps. Port of the RN
-/// `BookForm` + `book/new` + `book/edit`.
+/// Add / edit a book. Cover images are found by searching Apple Books then Open
+/// Library for the title (no camera roll); the picked thumbnail is downloaded +
+/// persisted only on save, so we don't fetch covers the reader never keeps. Port
+/// of the RN `BookForm` + `book/new` + `book/edit`.
 struct BookFormView: View {
     enum Mode { case add, edit(Book) }
 
@@ -91,7 +91,7 @@ struct BookFormView: View {
                 .buttonStyle(.plain)
                 .disabled(title.trimmedNonEmpty == nil || searching)
 
-                Text("Searches Open Library by title.")
+                Text("Searches Apple Books, then Open Library.")
                     .font(Theme.Font.caption)
                     .foregroundStyle(Theme.Palette.inkFaint)
 
