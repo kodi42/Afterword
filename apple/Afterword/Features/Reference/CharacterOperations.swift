@@ -13,8 +13,11 @@ enum CharacterOperations {
         book: Book,
         in context: ModelContext
     ) -> Character {
-        let character = Character(name: name, detail: detail, firstSeenChapter: firstSeenChapter, status: status, book: book)
+        let character = Character(name: name, detail: detail, firstSeenChapter: firstSeenChapter, status: status)
         context.insert(character)
+        // Append from the parent side so the Characters list refreshes live (see
+        // ChapterOperations.addNote for the SwiftData observation detail).
+        book.characters.append(character)
         return character
     }
 
@@ -33,6 +36,7 @@ enum CharacterOperations {
     }
 
     static func delete(_ character: Character, in context: ModelContext) {
+        character.book?.characters.removeAll { $0 === character }
         context.delete(character)
     }
 }

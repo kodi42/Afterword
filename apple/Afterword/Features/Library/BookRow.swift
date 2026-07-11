@@ -18,23 +18,10 @@ struct BookRow: View {
                         .foregroundStyle(Theme.Palette.inkSoft)
                         .lineLimit(1)
                 }
-                if let progress = progressText {
-                    Text(progress)
-                        .font(Theme.Font.caption)
-                        .foregroundStyle(Theme.Palette.accent)
-                        .padding(.top, 2)
-                }
+                BookProgressView(book: book)
             }
             Spacer(minLength: 0)
         }
         .cardStyle()
-    }
-
-    private var progressText: String? {
-        if let current = book.currentChapter, let total = book.totalChapters {
-            return "Ch \(current) of \(total)"
-        }
-        if let current = book.currentChapter { return "Ch \(current)" }
-        return nil
     }
 }

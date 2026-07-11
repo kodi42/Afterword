@@ -5,22 +5,37 @@ import UIKit
 /// ratio so rows and headers line up. Loads a local file by stored filename.
 struct BookCover: View {
     var coverName: String?
-    var width: CGFloat = 44
+    /// A fixed width (rows, headers, form preview). When `nil` the cover fills
+    /// its container's width at the 2:3 ratio — used by the Library cover grid.
+    var width: CGFloat? = 44
 
-    private var height: CGFloat { (width * 1.5).rounded() }
+    private var height: CGFloat? { width.map { ($0 * 1.5).rounded() } }
 
     var body: some View {
-        Group {
-            if let image = loadImage() {
-                Image(uiImage: image)
-                    .resizable()
-                    .scaledToFill()
-            } else {
-                placeholder
-            }
+        sized
+            .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm, style: .continuous))
+    }
+
+    @ViewBuilder private var sized: some View {
+        if let width {
+            artwork.frame(width: width, height: height)
+        } else {
+            // Fill the available width, keep the 2:3 ratio (grid cells).
+            Color.clear
+                .aspectRatio(2.0 / 3.0, contentMode: .fit)
+                .overlay { artwork }
+                .clipped()
         }
-        .frame(width: width, height: height)
-        .clipShape(RoundedRectangle(cornerRadius: Theme.Radius.sm, style: .continuous))
+    }
+
+    @ViewBuilder private var artwork: some View {
+        if let image = loadImage() {
+            Image(uiImage: image)
+                .resizable()
+                .scaledToFill()
+        } else {
+            placeholder
+        }
     }
 
     private func loadImage() -> UIImage? {
@@ -33,7 +48,7 @@ struct BookCover: View {
             .fill(Theme.Palette.surfaceAlt)
             .overlay(
                 Image(systemName: "book.closed")
-                    .font(.system(size: width * 0.42))
+                    .font(.system(size: (width ?? 96) * 0.42))
                     .foregroundStyle(Theme.Palette.inkFaint)
             )
             .overlay(

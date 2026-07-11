@@ -17,6 +17,9 @@ final class Book {
     var currentChapter: Int?
     var startedAt: Date?
     var finishedAt: Date?
+    /// When soft-deleted (moved to Recently Deleted). Nil = live on the shelf.
+    /// Purged for good 7 days later — see `BookOperations.purgeExpired`.
+    var deletedAt: Date?
     var createdAt: Date
     var updatedAt: Date
 

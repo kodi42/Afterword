@@ -6,6 +6,9 @@ import SwiftData
 @Model
 final class ChapterNote {
     var chapterNumber: Int
+    /// Optional end of a chapter range — a note covering chapters 5–8 has
+    /// `chapterNumber == 5`, `endChapter == 8`. Nil means a single-chapter note.
+    var endChapter: Int?
     var title: String?
     var body: String
     var createdAt: Date
@@ -13,8 +16,9 @@ final class ChapterNote {
 
     var book: Book?
 
-    init(chapterNumber: Int, title: String? = nil, body: String = "", book: Book? = nil) {
+    init(chapterNumber: Int, endChapter: Int? = nil, title: String? = nil, body: String = "", book: Book? = nil) {
         self.chapterNumber = chapterNumber
+        self.endChapter = endChapter
         self.title = title
         self.body = body
         self.book = book

@@ -22,7 +22,7 @@ struct ChaptersView: View {
                 : $0.createdAt > $1.createdAt
         }
     }
-    private var nextChapter: Int { (notes.map(\.chapterNumber).max() ?? 0) + 1 }
+    private var nextChapter: Int { (notes.map { $0.endChapter ?? $0.chapterNumber }.max() ?? 0) + 1 }
 
     var body: some View {
         ScrollViewReader { proxy in
@@ -78,14 +78,21 @@ struct ChaptersView: View {
             titleVisibility: .visible,
             presenting: pendingDelete
         ) { note in
-            Button("Delete", role: .destructive) { context.delete(note) }
+            Button("Delete", role: .destructive) { ChapterOperations.delete(note, in: context) }
             Button("Cancel", role: .cancel) {}
         } message: { _ in Text("This can't be undone.") }
     }
 
+    private func chapterLabel(_ note: ChapterNote) -> String {
+        if let end = note.endChapter, end > note.chapterNumber {
+            return "Chapters \(note.chapterNumber)–\(end)"
+        }
+        return "Chapter \(note.chapterNumber)"
+    }
+
     private func noteCard(_ note: ChapterNote) -> some View {
         VStack(alignment: .leading, spacing: Theme.Space.xs) {
-            Text("Chapter \(note.chapterNumber)" + (note.title.map { " — \($0)" } ?? ""))
+            Text(chapterLabel(note) + (note.title.map { " — \($0)" } ?? ""))
                 .font(Theme.Font.heading)
                 .foregroundStyle(Theme.Palette.accent)
             Text(note.body.isEmpty ? "(empty)" : note.body)

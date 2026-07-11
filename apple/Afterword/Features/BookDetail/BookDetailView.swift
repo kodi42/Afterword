@@ -64,14 +64,14 @@ struct BookDetailView: View {
         }
         .toolbar { ToolbarItem(placement: .topBarTrailing) { menu } }
         .sheet(isPresented: $showingEdit) { BookFormView(mode: .edit(book)) }
-        .confirmationDialog("Delete this book?", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
+        .confirmationDialog("Move to Recently Deleted?", isPresented: $showingDeleteConfirm, titleVisibility: .visible) {
             Button("Delete", role: .destructive) {
-                BookOperations.delete(book, in: context)
+                BookOperations.softDelete(book)
                 dismiss()
             }
             Button("Cancel", role: .cancel) {}
         } message: {
-            Text("Its chapter notes and reference entries go too. This can't be undone.")
+            Text("It leaves your shelf but you can restore it within 7 days from Recently Deleted.")
         }
     }
 

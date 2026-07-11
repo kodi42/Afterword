@@ -18,16 +18,18 @@ enum AliasOperations {
         if let existing = book.aliases.first(where: { $0.alias == alias }) {
             existing.canonical = canonical
         } else {
-            context.insert(CharacterAlias(alias: alias, canonical: canonical, book: book))
+            let row = CharacterAlias(alias: alias, canonical: canonical)
+            context.insert(row)
+            book.aliases.append(row) // parent-side so the merge takes effect live
         }
     }
 
     /// Split a merged name back out.
     static func unmerge(_ aliasName: String, book: Book, in context: ModelContext) {
         let alias = MarkerParser.normalizeKey(aliasName)
-        for existing in book.aliases where existing.alias == alias {
-            context.delete(existing)
-        }
+        let matches = book.aliases.filter { $0.alias == alias }
+        book.aliases.removeAll { $0.alias == alias } // parent-side so it un-folds live
+        for existing in matches { context.delete(existing) }
     }
 
     /// Build the normalized alias -> canonical map the parser expects, flattening

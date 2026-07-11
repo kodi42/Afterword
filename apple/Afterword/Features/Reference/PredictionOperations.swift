@@ -7,8 +7,11 @@ import SwiftData
 enum PredictionOperations {
     @discardableResult
     static func create(prompt: String, madeAtChapter: Int?, book: Book, in context: ModelContext) -> Prediction {
-        let prediction = Prediction(prompt: prompt, madeAtChapter: madeAtChapter, status: .open, book: book)
+        let prediction = Prediction(prompt: prompt, madeAtChapter: madeAtChapter, status: .open)
         context.insert(prediction)
+        // Append from the parent side so the Predictions list refreshes live (see
+        // ChapterOperations.addNote for the SwiftData observation detail).
+        book.predictions.append(prediction)
         return prediction
     }
 
@@ -19,6 +22,7 @@ enum PredictionOperations {
     }
 
     static func delete(_ prediction: Prediction, in context: ModelContext) {
+        prediction.book?.predictions.removeAll { $0 === prediction }
         context.delete(prediction)
     }
 
